@@ -13,6 +13,7 @@ import { Todo } from "../../entity/todo.entity";
 
 export class TodoList {
   private todoList: Todo[] = [];
+  private containerElem: HTMLElement | null = null;
 
   constructor() {
     this.loadTodoList();
@@ -35,16 +36,21 @@ export class TodoList {
   addTodo(todo: Todo) {
     this.todoList.push(todo);
     localStorage.setItem("todoList", JSON.stringify(this.todoList));
+    this.render();
   }
 
   removeTodoList() {
     localStorage.removeItem("todoList");
     this.todoList = [];
+    this.render();
   }
 
-  get element() {
-    const todoListContainer = document.createElement("div");
-    todoListContainer.innerHTML = `
+  private render() {
+    if (!this.containerElem) {
+      this.containerElem = document.createElement("div");
+    }
+
+    this.containerElem.innerHTML = `
       <ul>
         ${this.todoList
           .map(
@@ -58,6 +64,13 @@ export class TodoList {
           .join("")}
       </ul>
     `;
-    return todoListContainer;
+    // return todoListContainer;
+  }
+
+  get element() {
+    if (!this.containerElem) {
+      this.render();
+    }
+    return this.containerElem!;
   }
 }
