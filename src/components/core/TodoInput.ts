@@ -2,6 +2,7 @@ import { Todo } from "../../entity/todo.entity";
 
 export class TodoInput {
   private value: string = "";
+  private containerElem: HTMLElement | null = null;
 
   constructor(private addTodo: (todo: Todo) => void) {
     console.log("TodoInput constructor", this.initializeValue);
@@ -43,34 +44,31 @@ export class TodoInput {
     if (input) {
       input.value = this.value;
     }
+    this.render();
   };
-
-  // addTodo(todo: Todo) {
-  //   const prevTodoList = localStorage.getItem("todoList");
-  //   const newTodoList = [];
-  //   if (prevTodoList) {
-  //     const parsedTodos = JSON.parse(prevTodoList);
-  //     newTodoList.push(...parsedTodos, todo);
-  //   } else {
-  //     newTodoList.push(todo);
-  //   }
-  //   localStorage.setItem("todoList", JSON.stringify(newTodoList));
-  // }
 
   inputHandler(event: Event) {
     const target = event.target as HTMLInputElement;
     this.value = target.value;
+    this.render();
   }
 
-  get element() {
-    const containerElem = document.createElement("div");
-    containerElem.innerHTML = `
+  render() {
+    if (!this.containerElem) {
+      this.containerElem = document.createElement("div");
+    }
+    this.containerElem.innerHTML = `
       <input type="text" value="${this.value}" />
       <button id="add">추가</button>
     `;
+    this.setEventListener(this.containerElem);
+  }
 
-    this.setEventListener(containerElem);
+  get element() {
+    if (!this.containerElem) {
+      this.render();
+    }
 
-    return containerElem;
+    return this.containerElem;
   }
 }
